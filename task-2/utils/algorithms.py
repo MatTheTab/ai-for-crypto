@@ -20,19 +20,19 @@ def run_random_hash(data: bytes) -> bytes:
     return os.urandom(len(data))
 
 
-KEY_XOR = os.urandom(32)
-KEY_MUL = os.urandom(32)
+KEY_XOR = os.urandom(64)
+KEY_MUL = os.urandom(64)
 
 
 def run_MatTheHash(data: bytes) -> bytes:
     if not isinstance(data, (bytes, bytearray)):
         raise TypeError("data must be bytes")
-    if len(data) != 32:
+    if len(data) != 64:
         raise ValueError("run_MatTheHash expects exactly 32 bytes of input")
 
     x = int.from_bytes(data, sys.byteorder)
     xor_key = int.from_bytes(KEY_XOR, sys.byteorder)
     mul_key = int.from_bytes(KEY_MUL, sys.byteorder)
     x ^= xor_key
-    x = (x * mul_key) % (1 << 256)
-    return x.to_bytes(32, sys.byteorder)
+    x = (x * mul_key) % (1 << 512)
+    return x.to_bytes(64, sys.byteorder)
