@@ -8,12 +8,15 @@ class SBox:
     """
 
     def __init__(
-        self, values: np.ndarray, eager_metric_calculations: bool, metric_functions
+        self,
+        values: np.ndarray,
+        eager_metric_calculations: bool,
+        metric_functions: dict,
     ):
         self.values = values
         self.eager_metric_calculations = eager_metric_calculations
         self.metric_functions = metric_functions
-        for metric_name, metric_func_class in self.metric_functions:
+        for metric_name, metric_func_class in self.metric_functions.items():
             if not isinstance(metric_func_class, Metric):
                 raise TypeError("Passed metrc is not an isntance of the Metric class")
 
@@ -33,6 +36,6 @@ class SBox:
 
     def calculate_metrics(self):
         metric_values = {}
-        for metric_name, metric_func_obj in self.metric_functions:
+        for metric_name, metric_func_obj in self.metric_functions.items():
             metric_values[metric_name] = metric_func_obj.get(self.values)
         return metric_values
