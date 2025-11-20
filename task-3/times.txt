@@ -1,0 +1,6 @@
+Example Optimizer: 9.016 ms
+Example Optimizer: 9.162 ms
+Example Optimizer: 2.003 ms
+Example Optimizer: 13.080 ms
+Example Optimizer: 3.098 ms
+Example Optimizer: 12.232 ms
