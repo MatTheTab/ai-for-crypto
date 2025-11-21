@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Tuple, Optional, Iterable, Callable
 from utils.initialization import initialize_random
+from utils.algorithms.alg_utils import find_best_ever
 import random
 import numpy as np
 
@@ -125,22 +126,3 @@ def edge_swap_move(arr: np.ndarray) -> Iterable[np.ndarray]:
             new_arr = arr.copy()
             new_arr[i : j + 1] = new_arr[i : j + 1][::-1]
             yield new_arr
-
-
-def find_best_ever(
-    population: List[Any],
-    metric_name: str,
-    optimization_direction: str,
-) -> Optional[Any]:
-    if not population:
-        return None
-
-    def metric(ind: Any) -> float:
-        return ind.metrics[metric_name]
-
-    if optimization_direction == "maximize":
-        return max(population, key=metric)
-    elif optimization_direction == "minimize":
-        return min(population, key=metric)
-
-    raise ValueError("optimization_direction must be 'maximize' or 'minimize'")
