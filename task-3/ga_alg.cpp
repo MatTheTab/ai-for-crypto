@@ -202,7 +202,7 @@ int main(int argc, char** argv) {
     cout << "Running GA...\n";
 
     auto [best, iterations_used, progress] =
-        modified_genetic_algorithm(whs_metric, 1500, 1, 7, 104);
+        modified_genetic_algorithm(whs_metric, 15000, 1, 7, 104);
 
     int nl = calculate_nonlinearity(best);
 
