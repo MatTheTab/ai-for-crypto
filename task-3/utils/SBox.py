@@ -33,9 +33,31 @@ class SBox:
 
     def set_values(self, values: np.ndarray):
         self.values = values
+        if self.eager_metric_calculations:
+            self.metrics = self.calculate_metrics()
 
     def calculate_metrics(self):
         metric_values = {}
         for metric_name, metric_func_obj in self.metric_functions.items():
             metric_values[metric_name] = metric_func_obj.get(self.values)
         return metric_values
+
+    def evaluate_with_values(self, new_arr, metric_name):
+        return self.metric_functions[metric_name].get(new_arr)
+
+    def make_new(self, new_arr):
+        new_ind = self.shallow_copy()
+        new_ind.set_values(new_arr)
+        return new_ind
+
+    def copy(self):
+        return self.make_new(self.values.copy())
+
+    def shallow_copy(self):
+        new = SBox(
+            values=self.values.copy(),
+            eager_metric_calculations=self.eager_metric_calculations,
+            metric_functions=self.metric_functions,
+        )
+        new.metrics = self.metrics.copy() if self.eager_metric_calculations else {}
+        return new

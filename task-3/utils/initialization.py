@@ -3,10 +3,7 @@ from utils.SBox import SBox
 
 
 def initialize_random(
-    num_individuals: int,
-    *,
-    eager_metric_calculations: bool = False,
-    metric_functions=()
+    num_individuals: int, eager_metric_calculations: bool = False, metric_functions=None
 ):
     sboxes = []
 

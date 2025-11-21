@@ -12,7 +12,7 @@ class BitIndependeceCriterion(Metric):
         n = int(np.log2(N))
         m = sbox.dtype.itemsize * 8
         if N > 0:
-            m = int(np.ceil(np.log2(np.max(sbox) + 1)))
+            m = int(np.ceil(np.log2(int(np.max(sbox)) + 1)))
             m = max(m, 1)
         if m == 0:
             return 0.0
