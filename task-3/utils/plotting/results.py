@@ -63,6 +63,7 @@ def plot_times(all_times, save_dir="plots"):
 
     plt.title("Execution Time Distribution by Algorithm")
     plt.grid(axis="y", linestyle="--", alpha=0.6)
+    plt.xticks(rotation=45, ha="right")
 
     save_path = os.path.join(save_dir, "execution_times_violin.png")
     plt.savefig(save_path, dpi=300, bbox_inches="tight")

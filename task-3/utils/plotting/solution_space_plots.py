@@ -43,24 +43,6 @@ def plot_similarity_metric_landscape(
             ]
             ax.scatter(sims_r, vals_r, s=6, color="blue", alpha=0.6, label="Random")
 
-            # Greedy
-            sims_g = [s for s, mv in all_similarities["Greedy"][metric_name][move_name]]
-            vals_g = [
-                mv[metric_name]
-                for _, mv in all_similarities["Greedy"][metric_name][move_name]
-            ]
-            ax.scatter(sims_g, vals_g, s=30, color="green", label="Greedy")
-
-            # Steepest
-            sims_s = [
-                s for s, mv in all_similarities["Steepest"][metric_name][move_name]
-            ]
-            vals_s = [
-                mv[metric_name]
-                for _, mv in all_similarities["Steepest"][metric_name][move_name]
-            ]
-            ax.scatter(sims_s, vals_s, s=30, color="orange", label="Steepest")
-
             # Perturbed
             sims_p = [
                 s for s, mv in all_similarities["Perturbed"][metric_name][move_name]
@@ -128,8 +110,6 @@ def plot_similarity_metric_3d_landscapes_interactive(
 
             for strategy, color, size in [
                 ("Random", "blue", 3),
-                ("Greedy", "green", 6),
-                ("Steepest", "orange", 6),
                 ("Perturbed", "purple", 4),
             ]:
                 xs, ys, zs = extract_xyz(strategy, metric_x, metric_y, move_name)

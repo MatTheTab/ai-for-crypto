@@ -8,13 +8,21 @@ import copy
 from tqdm import tqdm
 import random
 import numpy as np
-from utils.algorithms.local_search import greedy, steepest, generate_all_moves
 
 MOVE_LIMIT = 10
 POP_SIZE = 10
 LS_SIZE = 2
 NUM_OPTIMAL_OFFSPRINGS = 1
 MAX_PERTURB_MOVES = 40
+
+
+def generate_all_moves(
+    move: Callable[[np.ndarray], Iterable[np.ndarray]],
+    arr: np.ndarray,
+) -> List[np.ndarray]:
+    moves = list(move(arr))
+    random.shuffle(moves)
+    return moves
 
 
 def analyze_solution_landscape(
