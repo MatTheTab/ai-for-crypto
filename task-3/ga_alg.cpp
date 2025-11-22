@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <chrono>
 using namespace std;
 
 uint8_t POPCOUNT[256];
@@ -135,29 +136,24 @@ tuple<vector<uint8_t>, int, vector<int>> modified_genetic_algorithm(
     vector<Individual> S_pop;
     vector<int> best_nl_each_iter;
 
-    // Init population
     for (int p = 0; p < K_pop; p++) {
         vector<uint8_t> arr(256);
         iota(arr.begin(), arr.end(), 0);
-        random_shuffle(arr.begin(), arr.end());
+        random_shuffle(arr.begin(), arr.end()); 
         int nl = calculate_nonlinearity(arr);
         long double whs = whs_metric.get(arr);
         S_pop.push_back({arr, nl, whs});
     }
 
-    // GA loop
     for (int iter = 0; iter < K_iter; iter++) {
-
         if (iter % 1000 == 0) {
             double pct = 100.0 * iter / K_iter;
             cout << "Iter " << iter << "/" << K_iter
-                 << " (" << fixed << setprecision(2) << pct << "%)\r";
+                 << " (" << fixed << setprecision(2) << pct << "%) | Best NL: " << S_pop[0].nl << "\r";
             cout.flush();
         }
 
         S_pop = elite_selection(S_pop, K_pop);
-
-        // track best NL this generation
         best_nl_each_iter.push_back(S_pop[0].nl);
 
         vector<Individual> new_items;
@@ -169,7 +165,7 @@ tuple<vector<uint8_t>, int, vector<int>> modified_genetic_algorithm(
                 long double whs_prime = whs_metric.get(S_prime);
 
                 if (nl_prime >= target_nl) {
-                    cout << "\nReached NL ≥ " << target_nl << endl;
+                    cout << "\nReached NL \u2265 " << target_nl << " at Iteration " << iter << endl;
                     return {S_prime, iter, best_nl_each_iter};
                 }
 
@@ -178,55 +174,85 @@ tuple<vector<uint8_t>, int, vector<int>> modified_genetic_algorithm(
         }
         S_pop.insert(S_pop.end(), new_items.begin(), new_items.end());
     }
-
     sort(S_pop.begin(), S_pop.end(), cmpElite);
     return {S_pop[0].sbox, K_iter, best_nl_each_iter};
 }
 
 int main(int argc, char** argv) {
-    srand(time(NULL));
+    
     init_popcount();
 
-    if (argc < 2) {
-        cerr << "Usage: " << argv[0] << " <output_directory>\n";
+    if (argc < 3) {
+        cerr << "Usage: " << argv[0] << " <output_directory> <num_iterations>\n";
         return 1;
     }
 
     string outdir = argv[1];
+    int num_iterations = stoi(argv[2]);
+
+    if (num_iterations <= 0) {
+        cerr << "Error: Number of iterations must be positive.\n";
+        return 1;
+    }
 
     if (outdir.back() != '/' && outdir.back() != '\\')
         outdir += "/";
 
     WHSMetric whs_metric(12);
+    
+    cout << "Starting " << num_iterations << " independent runs of the GA...\n";
+    cout << "------------------------------------------\n";
 
-    cout << "Running GA...\n";
+    for (int run = 1; run <= num_iterations; run++) {
+        srand(time(NULL) + run); 
+        
+        cout << "\nRunning Iteration " << run << " of " << num_iterations << "...\n";
+        auto start_time = std::chrono::high_resolution_clock::now();
+        auto [best, iterations_used, progress] =
+            modified_genetic_algorithm(whs_metric, 15000, 1, 7, 104);
 
-    auto [best, iterations_used, progress] =
-        modified_genetic_algorithm(whs_metric, 15000, 1, 7, 104);
+        auto end_time = std::chrono::high_resolution_clock::now();
+        
+        std::chrono::duration<double> duration = end_time - start_time;
+        double total_time_seconds = duration.count();
+        int nl = calculate_nonlinearity(best);
+        string run_suffix = "_" + to_string(run);
 
-    int nl = calculate_nonlinearity(best);
-
-    {
-        ofstream fout(outdir + "result.txt");
-        fout << "Best nonlinearity: " << nl << "\n";
-        fout << "Iterations used: " << iterations_used << "\n";
-        fout << "S-box values:\n";
-        for (int i = 0; i < 256; i++) {
-            fout << (int)best[i];
-            if (i != 255) fout << ", ";
+        {
+            ofstream fout(outdir + "result" + run_suffix + ".txt");
+            fout << "Run: " << run << "\n";
+            fout << "Best nonlinearity: " << nl << "\n";
+            fout << "Iterations used: " << iterations_used << "\n";
+            fout << "S-box values:\n";
+            for (int i = 0; i < 256; i++) {
+                fout << (int)best[i];
+                if (i != 255) fout << ", ";
+            }
+            fout << "\n";
         }
+
+        {
+            ofstream prog(outdir + "best_nonlinearity_progress" + run_suffix + ".txt");
+            for (int val : progress)
+                prog << val << "\n";
+        }
+
+        {
+            ofstream time_file(outdir + "time_taken" + run_suffix + ".txt");
+            time_file << "Run: " << run << "\n";
+            time_file << "Total calculation time: " << fixed << setprecision(4) << total_time_seconds << " seconds\n";
+        }
+
+        cout << "\nIteration " << run << " finished.\n";
+        cout << "Final NL = " << nl << endl;
+        cout << "Iterations = " << iterations_used << endl;
+        cout << "Time taken: " << fixed << setprecision(4) << total_time_seconds << " seconds" << endl;
+        cout << "Results for run " << run << " saved to files with suffix " << run_suffix << "\n";
+        cout << "------------------------------------------\n";
     }
 
-    {
-        ofstream prog(outdir + "best_nonlinearity_progress.txt");
-        for (int val : progress)
-            prog << val << "\n";
-    }
-
-    cout << "\nDone.\n";
-    cout << "Final NL = " << nl << endl;
-    cout << "Iterations = " << iterations_used << endl;
-    cout << "Results saved in directory: " << outdir << endl;
+    cout << "\n\u2705 All " << num_iterations << " iterations completed.\n";
+    cout << "All results saved in directory: " << outdir << endl;
 
     return 0;
 }
