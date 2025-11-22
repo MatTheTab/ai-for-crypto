@@ -42,8 +42,6 @@ def analyze_solution_landscape(
     }
 
     for metric_name in tqdm(metric_functions, desc="Analyzing Metrics"):
-        all_similarities["Greedy"][metric_name] = {}
-        all_similarities["Steepest"][metric_name] = {}
         all_similarities["Perturbed"][metric_name] = {}
         all_similarities["Random"][metric_name] = {}
 
@@ -53,22 +51,6 @@ def analyze_solution_landscape(
         for move_name, move in moves.items():
             direction = optimization_directions[metric_name]
 
-            _, population_greedy, _ = greedy(
-                population=copy.deepcopy(ls_population),
-                metric_name=metric_name,
-                optimization_direction=direction,
-                move=move,
-                move_limit=MOVE_LIMIT,
-            )
-
-            _, population_steepest, _ = steepest(
-                population=copy.deepcopy(ls_population),
-                metric_name=metric_name,
-                optimization_direction=direction,
-                move=move,
-                move_limit=MOVE_LIMIT,
-            )
-
             population_perturbed = generate_perturbed_population(
                 optimal=optimal,
                 move_func=move,
@@ -76,20 +58,10 @@ def analyze_solution_landscape(
                 max_moves=MAX_PERTURB_MOVES,
             )
 
-            sim_greedy = calculate_all_similarities_metrics(optimal, population_greedy)
-            sim_steepest = calculate_all_similarities_metrics(
-                optimal, population_steepest
-            )
             sim_perturbed = calculate_all_similarities_metrics(
                 optimal, population_perturbed
             )
 
-            all_similarities["Greedy"][metric_name][move_name] = copy.deepcopy(
-                sim_greedy
-            )
-            all_similarities["Steepest"][metric_name][move_name] = copy.deepcopy(
-                sim_steepest
-            )
             all_similarities["Perturbed"][metric_name][move_name] = copy.deepcopy(
                 sim_perturbed
             )

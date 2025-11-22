@@ -4,9 +4,6 @@
 #include <limits> // For LLONG_MAX
 
 using namespace std;
-
-// Define LLONG_MAX for environments where <limits> might not be sufficient or included.
-// We use 'long long' for iteration counting for robustness.
 #ifndef LLONG_MAX
 #define LLONG_MAX 9223372036854775807LL
 #endif
