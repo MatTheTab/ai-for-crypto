@@ -9,11 +9,9 @@ from tqdm import tqdm
 import random
 import numpy as np
 
-MOVE_LIMIT = 10
-POP_SIZE = 10
-LS_SIZE = 2
-NUM_OPTIMAL_OFFSPRINGS = 1
-MAX_PERTURB_MOVES = 40
+POP_SIZE = 20000
+NUM_OPTIMAL_OFFSPRINGS = 200
+MAX_PERTURB_MOVES = 50
 
 
 def generate_all_moves(
@@ -39,7 +37,6 @@ def analyze_solution_landscape(
     )
 
     similarities_random = calculate_all_similarities_metrics(optimal, population)
-    ls_population = population[:LS_SIZE]
     all_similarities: Dict[
         str, Dict[str, Dict[str, List[Tuple[float, Dict[str, float]]]]]
     ] = {
